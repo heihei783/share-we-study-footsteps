@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live2D AI Widget Professional</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+    <div id="live2d-widget">
+        <div id="restore-widget" style="display:none;">显示</div>
+
+        <div class="model-area" id="resize-container">
+            <div id="close-widget" title="最小化">×</div>
+            <div id="message-box"></div>
+            <div id="resize-handle">↘</div>
+            <canvas id="live2d"></canvas>
+        </div>
+
+        <div class="handle-bar">
+            <div class="button-group">
+                <div title="按住拖动位置" class="icon-btn" id="drag-handle">
+                    <img src="./picture/拖动.png" alt="拖动" width="20" height="20">
+                </div>
+
+                <div class="ai-input-wrapper" id="ai-box">
+                    <div id="toggle-history" title="查看历史对话">▼ 往期回想</div>
+                    <div id="history-viewer"></div>
+
+                    <div id="image-preview-container" style="display:none;">
+                        <img id="image-preview" src="" alt="preview">
+                        <div id="remove-img" title="移除图片">×</div>
+                    </div>
+
+                    <div class="chat-controls">
+                        <input type="file" id="image-input" accept="image/*" style="display:none;">
+                        <button type="button" class="icon-btn" id="upload-btn" title="上传图片识图">
+                            <img src="./picture/图片.png" alt="上传" width="20" height="20">
+                        </button>
+
+                        <input type="text" id="chat-input" placeholder="和她说点什么..." autocomplete="off">
+                        <button type="button" id="send-btn">发送</button>
+                    </div>
+                </div>
+                <button class="icon-btn" id="toggle-ai" title="AI 对话">
+                    <img src="./picture/聊天.png" alt="聊天" width="20" height="20">
+                </button>
+
+                <div class="voice-list-wrapper" id="voice-box">
+                    <div id="voice-list-container"></div>
+                </div>
+                <button class="icon-btn" id="toggle-voice" title="切换语音">
+                    <img src="./picture/语音.png" alt="语音" width="20" height="20">
+                </button>
+
+                <button class="icon-btn" id="next-char-btn" title="切换角色">
+                    <img src="./picture/人物.png" alt="角色" width="20" height="20">
+                </button>
+                <button class="icon-btn" id="next-outfit-btn" title="切换衣服">
+                    <img src="./picture/衣服.png" alt="换装" width="20" height="20">
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="./js/live2d.js"></script>
+    <script src="index.js"></script>
+</body>
+
+</html>

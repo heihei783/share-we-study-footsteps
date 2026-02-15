@@ -1,0 +1,297 @@
+:root {
+    --glass: rgba(255, 255, 255, 0.25);
+    --border: rgba(255, 255, 255, 0.4);
+    --text: #4a5568;
+    --accent: #ffb7c5;
+    /* 樱花粉 */
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'PingFang SC', 'STHeiti', sans-serif;
+    background: url('https://api.dujin.org/bing/1920.php') no-repeat center center/cover;
+    /* 这里建议换成你截图里的二次元背景 */
+    overflow: hidden;
+    color: var(--text);
+}
+
+/* 全屏毛玻璃遮罩，提升整体高级感 */
+body::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    z-index: 0;
+}
+
+.scene {
+    position: relative;
+    z-index: 1;
+    width: 90%;
+    height: 80%;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 20px;
+}
+
+/* 通用卡片样式 */
+.card {
+    background: var(--glass);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 20px;
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    cursor: default;
+}
+
+.card:hover {
+    transform: translateY(-10px) scale(1.02);
+    background: rgba(255, 255, 255, 0.35);
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.1);
+}
+
+/* 1. 个人形象区（大卡片） */
+.profile-card {
+    grid-column: 1 / 2;
+    grid-row: 1 / 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 5px solid white;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+/* 2. 状态标签区 */
+.tags-card {
+    grid-column: 2 / 4;
+    grid-row: 1 / 2;
+}
+
+/* 3. 实时心情/音乐区 */
+.music-card {
+    grid-column: 4 / 5;
+    grid-row: 1 / 2;
+    background: rgba(186, 230, 253, 0.4);
+    /* 浅蓝色偏向 */
+}
+
+/* 4. 生活碎片（大图/展示区） */
+.gallery-card {
+    grid-column: 2 / 5;
+    grid-row: 2 / 4;
+    display: flex;
+    gap: 15px;
+}
+
+.photo-slot {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
+    overflow: hidden;
+    position: relative;
+}
+
+.photo-slot img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.8;
+    transition: 0.5s;
+}
+
+.photo-slot:hover img {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+/* 5. 极简联系区 */
+/* 整个卡片的容器：改为纵向排列，居中对齐 */
+.contact-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    /* 根据实际情况调整内边距 */
+}
+
+/* 图标行布局 */
+.social-links {
+    display: flex;
+    gap: 18px;
+    /* 图标之间的距离 */
+    margin-bottom: 12px;
+}
+
+/* 你自己放的图标大小控制 */
+.social-icon {
+    width: 26px;
+    /* 调整图标宽度 */
+    height: 26px;
+    /* 调整图标高度 */
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    opacity: 0.8;
+}
+
+.social-icon:hover {
+    transform: scale(1.15);
+    /* 悬停放大 */
+    opacity: 1;
+}
+
+/* 邮箱和QQ的文字样式 */
+.contact-details {
+    display: flex;
+    flex-direction: column;
+    /* 纵向排列，如果空间够也可以删掉这行改为横向 */
+    align-items: center;
+    gap: 4px;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.85);
+    /* 半透明白色，保持毛玻璃感 */
+    margin-bottom: 8px;
+    font-family: 'Inter', sans-serif;
+    /* 建议使用较细的字体 */
+}
+
+/* 底部小字 */
+.footer-tag {
+    font-size: 0.6rem;
+    opacity: 0.5;
+    letter-spacing: 2px;
+}
+
+/* 文本修饰 */
+h2 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    color: #5a67d8;
+}
+
+p {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: #4a5568;
+}
+
+.tag-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.tag {
+    background: white;
+    padding: 6px 15px;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+/* 定义旋转动画 */
+@keyframes rotateRecord {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* 播放时的类 */
+.playing {
+    animation: rotateRecord 5s linear infinite;
+    box-shadow: 0 0 15px rgba(74, 144, 226, 0.4);
+}
+
+/* 鼠标悬停微放大 */
+#music-btn:hover {
+    transform: scale(1.05);
+}
+
+/* --- 个人信息页手机端深度适配 --- */
+@media screen and (max-width: 768px) {
+    body {
+        height: auto;
+        /* 允许页面纵向滚动 */
+        overflow-y: auto;
+        padding: 20px 0;
+    }
+
+    .scene {
+        width: 92%;
+        height: auto;
+        display: flex;
+        /* 手机端取消 Grid，改为 Flex 纵向排列 */
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    /* 让所有卡片宽度占满，取消原本的 grid-column 跨度 */
+    .card {
+        grid-column: auto !important;
+        grid-row: auto !important;
+        width: 100%;
+        padding: 15px;
+    }
+
+    /* 针对生活碎片（相册）卡片的特殊处理 */
+    .gallery-card {
+        flex-direction: column;
+        /* 照片由横排改为竖排 */
+        height: auto;
+    }
+
+    .photo-slot {
+        height: 200px;
+        /* 固定手机端照片高度，防止过长 */
+        width: 100%;
+        flex: none !important;
+    }
+
+    /* 调整头像和文字大小 */
+    .avatar {
+        width: 80px;
+        height: 80px;
+    }
+
+    h2 {
+        font-size: 1.2rem;
+    }
+
+    .tag {
+        font-size: 0.75rem;
+        padding: 4px 10px;
+    }
+
+    /* 极简联系区图标间距 */
+    .contact-card {
+        padding: 15px 0;
+        font-size: 20px;
+    }
+}

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>主页</title>
+    <script src="https://fastly.jsdelivr.net/npm/live2d-widgets@1.0.0/dist/autoload.js"></script>
+    <link rel="icon" href="/favicon.ico?v=1">
+    <link rel="stylesheet" href="./_index.css?v=1.0.2">
+    <link href="./font/6729c027c4aa7isrkyeufo7872.ttf" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+    <div id="red-envelope-popup" class="red-banner">
+        <a href="https://lucky.nocode.com/v2/s/8QLy7Hpq0WP" target="_blank" class="red-content">
+            <img src="./img/红包.png" alt="红包" class="red-icon">
+            <div class="red-text">
+                <span class="red-title">新年好运：红包抽奖开启！</span>
+            </div>
+        </a>
+        <span class="red-close" onclick="closeRedPopup()">×</span>
+    </div>
+    <div class="main-box">
+        <div class="up">
+            <img src="./img/头像.jpg" alt="小混沌">
+            <h1>小混沌</h1>
+        </div>
+        <div class="button">
+            <ul>
+                <li>
+                    <img src="./img/个人信息.png" alt="">
+                    <a href="./web/self_info.html">个人信息</a>
+                </li>
+                <li class="developing">
+                    <img src="./img/社交平台.png" alt="">
+                    <a href="#">交个朋友</a>
+                </li>
+                <li class="developing">
+                    <img src="./img/推荐.png" alt="">
+                    <a href="#">推荐</a>
+                </li>
+                <li class="developing">
+                    <img src="./img/我的作品.png" alt="">
+                    <a href="#">作品仓库</a>
+                </li>
+                <li class="ai-dropdown">
+                    <div class="ai-options">
+                        <a href="/ai/" class="ai-option">
+                            <img src="./img/机器人.png" alt="">
+                            <span>唯</span>
+                        </a>
+                        <a href="./live2d/index.html" class="ai-option ai-new">
+                            <img src="./img/机器人.png" alt="">
+                            <span>live2d_ai</span>
+                        </a>
+                    </div>
+                </li>
+                <li>
+                    <img src="./img/留言板.png" alt="">
+                    <a href="./web/message.html">留言板</a>
+                </li>
+            </ul>
+        </div>
+
+        <a href="./web/fireworks.html" class="fireworks-banner">
+            <span class="fireworks-emoji">🎆</span>
+            <span>新年烟花大会</span>
+            <div class="sparkle"></div>
+        </a>
+
+        <div class="dev-status">
+            <span class="dot"></span>
+            <p>建设中：作品仓库、交个朋友、推荐...(推荐横屏或网页)</p>
+        </div>
+
+        <a href="javascript:void(0);" id="nextBtn" class="bj_change">切换背景</a>
+
+    </div> <canvas id="fireworks-canvas"
+        style="position: fixed; top: 0; left: 0; pointer-events: none; z-index: 9999;"></canvas>
+
+    <script src="./scripts-test.js"></script>
+</body>
+
+</html>

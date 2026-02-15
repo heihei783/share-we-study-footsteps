@@ -1,0 +1,325 @@
+/* --- 全局样式 --- */
+body {
+    margin: 0;
+    overflow: hidden;
+    /* 防止页面出现滚动条 */
+    user-select: none;
+    /* 禁止选中文本 */
+    font-family: 'Microsoft YaHei', sans-serif;
+}
+
+/* --- 主容器定位 --- */
+#live2d-widget {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    display: flex;
+    align-items: center;
+    z-index: 999;
+}
+
+/* --- 模型区域 --- */
+.model-area {
+    position: relative;
+    width: 300px;
+    height: 500px;
+    /* 缩放时的平滑过渡交给 JS 控制，此处不加 transition 以免卡顿 */
+}
+
+#live2d {
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
+    object-fit: contain;
+}
+
+/* --- 消息气泡 --- */
+#message-box {
+    position: absolute;
+    bottom: 90%;
+    /* 调整位置，避免遮挡头部 */
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 100px;
+    max-width: 250px;
+    padding: 12px 18px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 2px solid #ffb6c1;
+    border-radius: 15px;
+    color: #ff7675;
+    font-size: 14px;
+    line-height: 1.6;
+    word-break: break-all;
+    white-space: normal;
+    opacity: 0;
+    transition: all 0.3s ease;
+    pointer-events: none;
+    /* 允许点击穿透 */
+    box-shadow: 0 8px 25px rgba(255, 182, 193, 0.3);
+    z-index: 1001;
+    /* 最高层级 */
+}
+
+#message-box.show {
+    opacity: 1;
+    bottom: 95%;
+    /* 浮动动画效果 */
+}
+
+/* --- 控制栏与按钮 --- */
+.handle-bar {
+    margin-left: 15px;
+}
+
+.button-group {
+    background: rgba(255, 255, 255, 0.6);
+    /* 增加一点不透明度 */
+    backdrop-filter: blur(10px);
+    padding: 10px;
+    border-radius: 30px;
+    border: 1px solid rgba(255, 182, 193, 0.3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.icon-btn {
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 50%;
+    background: white;
+    color: #ff7675;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.icon-btn:hover {
+    background: #ffb6c1;
+    color: white;
+    transform: scale(1.1);
+}
+
+.icon-btn:disabled {
+    background: #f0f0f0;
+    color: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* --- AI 面板与历史记录 --- */
+.ai-input-wrapper {
+    display: none;
+    width: 280px;
+    background: white;
+    border-radius: 15px;
+    padding: 12px;
+    border: 1px solid #ffb6c1;
+    margin: 5px 0;
+    flex-direction: column;
+    box-sizing: border-box;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+.ai-input-wrapper.open {
+    display: flex;
+}
+
+#history-viewer {
+    height: 0;
+    overflow-y: auto;
+    transition: height 0.3s ease;
+    background: #fffcfc;
+    border-radius: 8px;
+    font-size: 12px;
+}
+
+#history-viewer.show {
+    height: 160px;
+    margin: 8px 0;
+    border: 1px solid #fff0f0;
+    padding: 10px;
+}
+
+/* --- 图片预览 --- */
+#image-preview-container {
+    position: relative;
+    margin: 8px 0;
+    border: 2px dashed #ffb6c1;
+    border-radius: 10px;
+    padding: 5px;
+    text-align: center;
+    background: #fff5f7;
+}
+
+#image-preview {
+    max-width: 100%;
+    max-height: 120px;
+    border-radius: 5px;
+}
+
+#remove-img {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #ff7675;
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 20px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* --- 聊天控制区 --- */
+.chat-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    margin-top: 5px;
+}
+
+#chat-input {
+    flex: 1;
+    min-width: 0;
+    border: 1px solid #ffb6c1;
+    border-radius: 20px;
+    padding: 8px 12px;
+    outline: none;
+    font-size: 13px;
+    transition: 0.2s;
+}
+
+#chat-input:focus {
+    box-shadow: 0 0 0 2px rgba(255, 182, 193, 0.5);
+}
+
+#send-btn {
+    background: #ff7675;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    flex-shrink: 0;
+    font-size: 13px;
+    transition: 0.2s;
+}
+
+#send-btn:hover {
+    background: #ff6b6b;
+}
+
+#send-btn:disabled {
+    background: #fab1a0;
+    cursor: wait;
+}
+
+/* --- 窗口控制 (最小化/缩放) --- */
+#close-widget {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    width: 24px;
+    height: 24px;
+    background: rgba(255, 118, 117, 0.8);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    transition: 0.3s;
+    z-index: 100;
+}
+
+.model-area:hover #close-widget {
+    opacity: 1;
+}
+
+#restore-widget {
+    width: 60px;
+    height: 60px;
+    background: white;
+    border: 2px solid #ffb6c1;
+    border-radius: 50%;
+    color: #ff7675;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+#resize-handle {
+    position: absolute;
+    right: 5px;
+    bottom: 5px;
+    cursor: nwse-resize;
+    color: rgba(255, 182, 193, 0.8);
+    font-size: 20px;
+    z-index: 100;
+}
+
+/* --- 最小化状态 --- */
+#live2d-widget.minimized .model-area,
+#live2d-widget.minimized .handle-bar {
+    display: none !important;
+}
+
+#live2d-widget.minimized #restore-widget {
+    display: flex !important;
+}
+
+/* --- 语音列表 --- */
+.voice-list-wrapper {
+    display: none;
+    width: 160px;
+    background: white;
+    border-radius: 15px;
+    padding: 10px;
+    border: 1px solid #ffb6c1;
+    margin: 5px 0;
+    max-height: 200px;
+    overflow-y: auto;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.voice-list-wrapper.open {
+    display: flex;
+}
+
+.voice-item {
+    padding: 8px;
+    margin: 2px 0;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #ff7675;
+    text-align: center;
+    transition: 0.2s;
+}
+
+.voice-item:hover {
+    background: #fff0f0;
+}
+
+.voice-item.active {
+    background: #ff7675 !important;
+    color: white !important;
+}

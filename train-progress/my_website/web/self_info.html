@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人中心</title>
+    <link rel="stylesheet" href="../css_store/self_info.css">
+    <link rel="icon" href="/favicon.ico?v=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+
+    <div class="scene">
+        <div class="card profile-card">
+            <img src="../img/头像.jpg" alt="avatar" class="avatar">
+            <h2>小混沌</h2>
+            <p>“在数字海洋里打捞星光。”</p>
+        </div>
+
+        <div class="card tags-card">
+            <h3>探索领域</h3>
+            <div class="tag-cloud">
+                <div class="tag-cloud">
+                    <span class="tag">🎨 极简美学</span>
+                    <span class="tag">💻 编程</span>
+                    <span class="tag">🎮 独立游戏</span>
+                    <span class="tag">📺 动漫</span>
+                    <span class="tag">📷 胶片摄影</span>
+                    <span class="tag">🌌 天文</span>
+                    <span class="tag">🌸 二次元</span>
+                    <span class="tag">🍱 美食</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card music-card">
+            <p style="font-size: 0.8rem; opacity: 0.7;">Now Playing</p>
+            <div style="margin-top: 10px;">
+                <div style="font-weight: bold;">仲夏夜之梦</div>
+                <div style="font-size: 0.8rem;">兔裏煎蛋巻/花玲/祁澈/...</div>
+
+                <div class="music-cover-wrapper">
+                    <img id="music-btn" src="../img/音乐.jpg" alt="仲夏夜之梦"
+                        style="width: 70px; height: 70px; margin-top: 20px; border-radius: 50%; cursor: pointer; transition: 0.3s;">
+                </div>
+
+                <audio id="my-audio" src="../img/兔裹煎蛋卷,花玲,祁澈 - 仲夏夜之梦.mp3" loop></audio>
+            </div>
+        </div>
+
+        <div class="card gallery-card">
+            <div class="photo-slot">
+                <img src="https://picsum.photos/400/600?random=1" alt="Life 1">
+            </div>
+            <div class="photo-slot" style="flex: 1.5; position: relative;" id="auto-carousel">
+                <img id="main-img" src="../img/瞬间/picture_01.jpg" alt="Life 2">
+                <div
+                    style="position: absolute; bottom: 15px; left: 15px; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.5); z-index: 2;">
+                    <h4 id="img-title">瞬间</h4>
+                    <p id="img-desc" style="color: white;">光影总是最好的画笔</p>
+                </div>
+            </div>
+            <div class="photo-slot">
+                <img src="https://picsum.photos/400/600?random=3" alt="Life 3">
+            </div>
+        </div>
+
+        <div class="card contact-card">
+            <div class="social-links">
+                <a href="https://space.bilibili.com/471088544?spm_id_from=333.1007.0.0" target="_blank"
+                    title="Bilibili">
+                    <img src="../img/bilibili.png" alt="Bilibili" class="social-icon">
+                </a>
+                <a href="https://github.com/heihei783/share-we-study-footsteps" target="_blank" title="GitHub">
+                    <img src="../img/github.png" alt="GitHub" class="social-icon">
+                </a>
+                <a href="https://gitee.com/little-art-zhang" target="_blank" title="Gitee">
+                    <img src="../img/gitee.png" alt="Gitee" class="social-icon">
+                </a>
+            </div>
+
+            <div class="contact-details">
+                <span>📧 xiaohundun_wx@qq.com</span>
+                <span>🐧 QQ: 2423848119</span>
+            </div>
+
+            <p class="footer-tag">/ 保持活力 /</p>
+        </div>
+        <p style="font-size: 0.7rem; margin-top: 8px;">/ 保持连接 /</p>
+    </div>
+    </div>
+    <script src="../java_scr/self_info.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,2144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新年烟花</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: radial-gradient(ellipse at bottom, #1a1a3a 0%, #0a0a1a 50%, #050510 100%);
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+        }
+
+        #fireworksCanvas {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .title {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            text-align: left;
+            color: #fff;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .title h1 {
+            font-size: 60px;
+            font-weight: bold;
+            text-shadow: 0 0 20px #ff6b6b, 0 0 40px #ff6b6b, 0 0 60px #ff6b6b;
+            animation: glow 2s ease-in-out infinite alternate;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .music-control {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            z-index: 20;
+            cursor: pointer;
+            padding: 8px 12px;
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.2), rgba(254, 202, 87, 0.2));
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 20px;
+            color: #fff;
+            font-size: 12px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 15px rgba(255, 107, 107, 0.3),
+                0 0 30px rgba(254, 202, 87, 0.2);
+            animation: musicGlow 2s ease-in-out infinite alternate;
+        }
+
+        .click-counter {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 20;
+            padding: 10px 15px;
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.2), rgba(254, 202, 87, 0.2));
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 20px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 15px rgba(255, 107, 107, 0.3),
+                0 0 30px rgba(254, 202, 87, 0.2);
+        }
+
+        .music-control:hover {
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.4), rgba(254, 202, 87, 0.4));
+            border-color: rgba(255, 255, 255, 0.7);
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.5),
+                0 0 40px rgba(254, 202, 87, 0.3),
+                0 0 60px rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        .music-control:active {
+            transform: scale(0.95);
+        }
+
+        @keyframes musicGlow {
+            from {
+                box-shadow: 0 0 15px rgba(255, 107, 107, 0.3),
+                    0 0 30px rgba(254, 202, 87, 0.2);
+            }
+
+            to {
+                box-shadow: 0 0 20px rgba(254, 202, 87, 0.3),
+                    0 0 40px rgba(255, 107, 107, 0.2);
+            }
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 20px #ff6b6b, 0 0 40px #ff6b6b, 0 0 60px #ff6b6b;
+            }
+
+            to {
+                text-shadow: 0 0 30px #feca57, 0 0 60px #feca57, 0 0 90px #feca57;
+            }
+        }
+
+        .instructions {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 16px;
+            text-align: center;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .envelope-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .envelope {
+            width: 450px;
+            height: 320px;
+            background: linear-gradient(135deg, #ff6b6b, #feca57);
+            border-radius: 15px;
+            cursor: pointer;
+            position: relative;
+            box-shadow: 0 0 40px rgba(255, 107, 107, 0.6);
+            transition: all 0.5s ease;
+            overflow: hidden;
+        }
+
+        .envelope:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 50px rgba(255, 107, 107, 0.8);
+        }
+
+        .envelope-flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50%;
+            background: linear-gradient(135deg, #ff8e8e, #ffcc80);
+            clip-path: polygon(0 0, 100% 0, 50% 100%);
+            transition: transform 0.6s ease;
+            z-index: 2;
+        }
+
+        .envelope.open .envelope-flap {
+            transform: translateY(-100%);
+        }
+
+        .envelope-wax {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            z-index: 3;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .envelope-wax:hover {
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+
+        .wax-pattern {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .wax-pattern svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 0 8px rgba(255, 107, 107, 0.8));
+        }
+
+        .envelope-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: #fff;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            opacity: 0;
+            transition: all 0.6s ease;
+            max-width: 350px;
+            z-index: 1;
+        }
+
+        .envelope.open .envelope-content {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+
+        .letter {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: linear-gradient(135deg, #fff 0%, #f8f8f8 100%);
+            padding: 80px 80px 80px 80px;
+            padding-top: 60px;
+            border-radius: 30px;
+            text-align: center;
+            opacity: 0;
+            transition: all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            max-width: 80vw;
+            min-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
+            z-index: 200;
+            border: 3px solid #ff6b6b;
+        }
+
+        .letter.show {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+
+        .letter h2 {
+            color: #ff6b6b;
+            margin-bottom: 30px;
+            font-size: 42px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .letter p {
+            color: #333;
+            font-size: 22px;
+            line-height: 2.2;
+            margin-bottom: 30px;
+            font-weight: 500;
+            text-indent: 2em;
+            text-align: justify;
+        }
+
+        .letter-icon {
+            font-size: 100px;
+            text-align: center;
+            margin-bottom: 40px;
+            animation: bounce 2s ease-in-out infinite;
+            filter: drop-shadow(0 5px 15px rgba(255, 107, 107, 0.3));
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .message-popup {
+            position: fixed;
+            top: 25vh;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #fff;
+            font-size: 20px;
+            text-align: center;
+            line-height: 1.6;
+            max-width: 800px;
+            z-index: 150;
+            opacity: 0;
+            animation: fadeInOut 15s ease-in-out forwards;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 0, 0, 0.6);
+            pointer-events: none;
+        }
+
+        .message-popup h3 {
+            color: #feca57;
+            font-size: 24px;
+            margin-bottom: 10px;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(254, 202, 87, 0.5);
+        }
+
+        .message-popup p {
+            margin: 0;
+            font-weight: 300;
+        }
+
+        @keyframes fadeInOut {
+            0% {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+
+            15% {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+
+            85% {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+
+            100% {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-20px);
+            }
+        }
+
+        .envelope-content h2 {
+            color: #ff6b6b;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .envelope-content p {
+            color: #333;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .close-btn {
+            position: sticky;
+            top: 10px;
+            float: right;
+            width: 40px;
+            height: 40px;
+            background: #ff6b6b;
+            border: none;
+            border-radius: 50%;
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 10;
+            margin: -50px -50px 10px 10px;
+        }
+
+        .close-btn:hover {
+            background: #feca57;
+            transform: scale(1.1);
+        }
+
+        .envelope-icon {
+            font-size: 60px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .new-year-greeting {
+            position: fixed;
+            top: 25vh;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 120px;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 0 20px rgba(255, 107, 107, 0.8),
+                0 0 40px rgba(254, 202, 87, 0.6),
+                0 0 60px rgba(255, 107, 107, 0.4),
+                0 0 80px rgba(254, 202, 87, 0.3),
+                0 0 100px rgba(255, 107, 107, 0.2);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 100;
+            display: flex;
+            gap: 30px;
+            filter: brightness(1.2);
+        }
+
+        .new-year-greeting.show {
+            animation: greetingShow 3s ease-out forwards;
+        }
+
+        .greeting-char {
+            display: inline-block;
+            opacity: 0;
+            transform: translateX(-200px);
+            animation: charMove 1s ease-out forwards, charSmile 3s ease-in-out infinite alternate, colorShift 8s linear infinite;
+            animation-delay: var(--delay), 1s, 2s;
+            text-shadow: 0 0 30px rgba(255, 107, 107, 1),
+                0 0 60px rgba(254, 202, 87, 0.8),
+                0 0 90px rgba(255, 107, 107, 0.6),
+                0 0 120px rgba(254, 202, 87, 0.4);
+            filter: drop-shadow(0 0 20px rgba(255, 107, 107, 0.8));
+        }
+
+        .greeting-char:nth-child(1) {
+            animation: charMove 1s ease-out forwards, charSmile1 3s ease-in-out infinite alternate, colorShift 8s linear infinite;
+            animation-delay: var(--delay), 1s, 2s;
+        }
+
+        .greeting-char:nth-child(2) {
+            animation: charMove 1s ease-out forwards, charSmile2 3.2s ease-in-out infinite alternate, colorShift 8s linear infinite;
+            animation-delay: var(--delay), 1.2s, 2s;
+        }
+
+        .greeting-char:nth-child(3) {
+            animation: charMove 1s ease-out forwards, charSmile3 3.5s ease-in-out infinite alternate, colorShift 8s linear infinite;
+            animation-delay: var(--delay), 1.5s, 2s;
+        }
+
+        .greeting-char:nth-child(4) {
+            animation: charMove 1s ease-out forwards, charSmile4 3.8s ease-in-out infinite alternate, colorShift 8s linear infinite;
+            animation-delay: var(--delay), 1.8s, 2s;
+        }
+
+        @keyframes greetingShow {
+            0% {
+                opacity: 0;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .back-home-btn {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 30px;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .back-home-btn:hover {
+            transform: translateX(-50%) translateY(-3px);
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .back-home-btn.show {
+            opacity: 1;
+        }
+
+        @keyframes charMove {
+            0% {
+                opacity: 0;
+                transform: translateX(-200px) scale(0.5) rotate(-10deg);
+            }
+
+            50% {
+                opacity: 1;
+                transform: translateX(0) scale(1.2) rotate(5deg);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateX(0) scale(1) rotate(0deg);
+            }
+        }
+
+        @keyframes charSmile1 {
+            0% {
+                transform: rotate(-8deg) translateY(0);
+            }
+
+            100% {
+                transform: rotate(12deg) translateY(-5px);
+            }
+        }
+
+        @keyframes charSmile2 {
+            0% {
+                transform: rotate(-5deg) translateY(0);
+            }
+
+            100% {
+                transform: rotate(15deg) translateY(-8px);
+            }
+        }
+
+        @keyframes charSmile3 {
+            0% {
+                transform: rotate(-10deg) translateY(0);
+            }
+
+            100% {
+                transform: rotate(8deg) translateY(-6px);
+            }
+        }
+
+        @keyframes charSmile4 {
+            0% {
+                transform: rotate(-6deg) translateY(0);
+            }
+
+            100% {
+                transform: rotate(10deg) translateY(-7px);
+            }
+        }
+
+        @keyframes colorShift {
+            0% {
+                color: #ff6b6b;
+                text-shadow: 0 0 30px rgba(255, 107, 107, 1),
+                    0 0 60px rgba(254, 202, 87, 0.8),
+                    0 0 90px rgba(255, 107, 107, 0.6),
+                    0 0 120px rgba(254, 202, 87, 0.4);
+            }
+
+            25% {
+                color: #feca57;
+                text-shadow: 0 0 30px rgba(254, 202, 87, 1),
+                    0 0 60px rgba(72, 219, 251, 0.8),
+                    0 0 90px rgba(254, 202, 87, 0.6),
+                    0 0 120px rgba(72, 219, 251, 0.4);
+            }
+
+            50% {
+                color: #48dbfb;
+                text-shadow: 0 0 30px rgba(72, 219, 251, 1),
+                    0 0 60px rgba(255, 159, 243, 0.8),
+                    0 0 90px rgba(72, 219, 251, 0.6),
+                    0 0 120px rgba(255, 159, 243, 0.4);
+            }
+
+            75% {
+                color: #ff9ff3;
+                text-shadow: 0 0 30px rgba(255, 159, 243, 1),
+                    0 0 60px rgba(84, 160, 255, 0.8),
+                    0 0 90px rgba(255, 159, 243, 0.6),
+                    0 0 120px rgba(84, 160, 255, 0.4);
+            }
+
+            100% {
+                color: #ff6b6b;
+                text-shadow: 0 0 30px rgba(255, 107, 107, 1),
+                    0 0 60px rgba(254, 202, 87, 0.8),
+                    0 0 90px rgba(255, 107, 107, 0.6),
+                    0 0 120px rgba(254, 202, 87, 0.4);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .new-year-greeting {
+                font-size: 60px;
+                gap: 15px;
+                top: 20vh;
+            }
+
+            .click-counter {
+                font-size: 14px;
+                padding: 8px 16px;
+            }
+
+            .music-control {
+                font-size: 14px;
+                padding: 8px 16px;
+            }
+
+            .letter {
+                padding: 40px;
+                min-width: 90vw;
+                max-width: 90vw;
+            }
+
+            .letter h2 {
+                font-size: 28px;
+            }
+
+            .letter p {
+                font-size: 16px;
+                line-height: 1.8;
+                margin-bottom: 20px;
+            }
+
+            .close-btn {
+                width: 35px;
+                height: 35px;
+                font-size: 18px;
+            }
+
+            .envelope {
+                width: 200px;
+                height: 140px;
+            }
+
+            .envelope-flap {
+                width: 200px;
+                height: 100px;
+                border-top: 70px solid rgba(255, 107, 107, 0.8);
+            }
+
+            .envelope-wax {
+                width: 50px;
+                height: 50px;
+                top: 50px;
+                right: 75px;
+            }
+
+            .envelope-content {
+                width: 200px;
+                height: 140px;
+            }
+
+            .envelope-content h2 {
+                font-size: 18px;
+            }
+
+            .envelope-content p {
+                font-size: 12px;
+            }
+
+            .message-popup {
+                font-size: 16px;
+                max-width: 90vw;
+                padding: 20px;
+            }
+
+            .message-popup h3 {
+                font-size: 20px;
+            }
+
+            .back-home-btn {
+                font-size: 14px;
+                padding: 10px 24px;
+                bottom: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .new-year-greeting {
+                font-size: 45px;
+                gap: 10px;
+                top: 15vh;
+            }
+
+            .click-counter {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+
+            .music-control {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+
+            .letter {
+                padding: 30px;
+                min-width: 95vw;
+                max-width: 95vw;
+            }
+
+            .letter h2 {
+                font-size: 24px;
+            }
+
+            .letter p {
+                font-size: 14px;
+                line-height: 1.6;
+                margin-bottom: 15px;
+            }
+
+            .close-btn {
+                width: 30px;
+                height: 30px;
+                font-size: 16px;
+            }
+
+            .envelope {
+                width: 160px;
+                height: 112px;
+            }
+
+            .envelope-flap {
+                width: 160px;
+                height: 80px;
+                border-top: 56px solid rgba(255, 107, 107, 0.8);
+            }
+
+            .envelope-wax {
+                width: 40px;
+                height: 40px;
+                top: 40px;
+                right: 60px;
+            }
+
+            .envelope-content {
+                width: 160px;
+                height: 112px;
+            }
+
+            .envelope-content h2 {
+                font-size: 16px;
+            }
+
+            .envelope-content p {
+                font-size: 10px;
+            }
+
+            .message-popup {
+                font-size: 14px;
+                max-width: 95vw;
+                padding: 15px;
+            }
+
+            .message-popup h3 {
+                font-size: 18px;
+            }
+
+            .back-home-btn {
+                font-size: 12px;
+                padding: 8px 20px;
+                bottom: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="fireworksCanvas"></canvas>
+
+    <button class="music-control" id="musicControl">🎵 播放音乐</button>
+
+    <div class="click-counter" id="clickCounter">点击次数: 0 / 60</div>
+
+    <div class="new-year-greeting" id="newYearGreeting">
+        <span class="greeting-char" style="--delay: 0s">新</span>
+        <span class="greeting-char" style="--delay: 0.3s">年</span>
+        <span class="greeting-char" style="--delay: 0.6s">快</span>
+        <span class="greeting-char" style="--delay: 0.9s">乐</span>
+    </div>
+
+    <a href="../index.html" class="back-home-btn" id="backHomeBtn">🏠 返回主页</a>
+
+    <div class="envelope-container" id="envelopeContainer">
+        <div class="envelope" id="envelope">
+            <div class="envelope-flap"></div>
+            <div class="envelope-wax" id="envelopeWax">
+                <div class="wax-pattern">
+                    <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <radialGradient id="waxGradient" cx="50%" cy="50%" r="50%">
+                                <stop offset="0%" style="stop-color:#ff6b6b;stop-opacity:1" />
+                                <stop offset="50%" style="stop-color:#feca57;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#ff6b6b;stop-opacity:1" />
+                            </radialGradient>
+                        </defs>
+                        <circle cx="50" cy="50" r="45" fill="url(#waxGradient)" />
+                        <circle cx="50" cy="50" r="40" fill="none" stroke="#fff" stroke-width="2" opacity="0.5" />
+                        <g transform="translate(50, 50)">
+                            <path
+                                d="M0 -30 L2 -5 L8 -8 L12 0 L6 2 L15 5 L8 8 L10 15 L2 8 L0 25 L-2 8 L-10 15 L-8 8 L-15 5 L-6 2 L-12 0 L-8 -8 L-2 -5 Z"
+                                fill="#fff" opacity="0.8" />
+                            <circle cx="0" cy="0" r="3" fill="#ff6b6b" />
+                            <path d="M0 -30 L0 25" stroke="#fff" stroke-width="1" opacity="0.6" />
+                            <path d="M-15 5 L15 5" stroke="#fff" stroke-width="1" opacity="0.6" />
+                            <path d="M-10 15 L10 -15" stroke="#fff" stroke-width="1" opacity="0.6" />
+                            <path d="M10 15 L-10 -15" stroke="#fff" stroke-width="1" opacity="0.6" />
+                        </g>
+                        <circle cx="50" cy="50" r="48" fill="none" stroke="#feca57" stroke-width="3" opacity="0.7" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="letter" id="letter">
+        <button class="close-btn" id="closeBtn">×</button>
+        <h2>逐光而行，马踏春深</h2>
+        <p>岁律更迭，华章再启。当2026年的第一缕晨曦越过地平线，我们告别了过往的沉淀，跃入这烈烈奔腾的丙午马年。新年之始，不仅是日历的翻新，更是生命的一次破土，是灵魂在经历冬蛰后的重新觉醒。</p>
+        <p>在这充满了火红能量的一年里，我不再祝你四平八稳，因为平庸的安稳有时会消磨掉灵魂最珍贵的锋芒。我愿祝你拥有鲜衣怒马少年时的赤诚，在大时代的喧嚣中，依然能听清内心最细微的渴望。愿你拥有一种不被定义的自由，像旷野上的骏马，不为取悦骑手而奔跑，只为感受风的速度与大地的宽广。
+        </p>
+        <p>人们常说马到成功，但我更愿你拥有敢于失败的旷达与推倒重来的勇气。世俗定义的成功转瞬即逝，而你在一次次跌倒又跃起中磨砺出的筋骨，才是岁月带不走的财富。愿你在2026年的每一个清晨，都能在镜中看到一个比昨天更笃定、更清醒的自己。
+        </p>
+        <p>关于生活，愿你向下扎根。在急功近利的时代，守住内心的方寸之地，慢火烹茶，静心读书，在烟火气中提炼生命的真味。亦愿你向上生长，保持对世界永恒的好奇，像光一样去探索阴影背后的真相。不必急于抵达终点，因为风景本就在跋涉的每一个瞬间。
+        <p>最后，愿这新岁之火，点燃你心底沉睡的理想。愿你眼里的光不因世故而黯淡，愿你手里的笔能写出自己命运的注脚。2026，愿你马不停蹄，终得所愿；愿你历经千帆，归来仍是那个逐光而行的赶路人。
+        </p>
+        <p style="margin-top: 30px; font-weight: bold;">新春志喜，岁岁平安。</p>
+        <p style="font-weight: bold; text-align: right; margin-top: 20px;">——小混沌</p>
+    </div>
+
+    <div id="messageContainer"></div>
+
+    <audio id="bgm" loop>
+        <source src="bgm/知晏; Zenn白景 - 当此刻听见你我.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        const canvas = document.getElementById('fireworksCanvas');
+        const ctx = canvas.getContext('2d');
+        const bgm = document.getElementById('bgm');
+        const musicControl = document.getElementById('musicControl');
+        const envelopeContainer = document.getElementById('envelopeContainer');
+        const envelope = document.getElementById('envelope');
+        const envelopeWax = document.getElementById('envelopeWax');
+        const closeBtn = document.getElementById('closeBtn');
+        const letter = document.getElementById('letter');
+        const clickCounter = document.getElementById('clickCounter');
+        const messageContainer = document.getElementById('messageContainer');
+        const newYearGreeting = document.getElementById('newYearGreeting');
+        let isPlaying = false;
+        let hasInteracted = false;
+        let clickCount = 0;
+        const targetClicks = 60;
+        let lastClickTime = 0;
+        let envelopeShown = false;
+        let shownMessages = new Set();
+        let letterClosed = false;
+        let fireworkWaveCount = 0;
+        let isFireworkWaveActive = false;
+
+        const messages = [
+            { count: 10, title: '轻抚旧伤', content: '过去这一年，你像是在寒夜里默默赶路的旅人，虽然风雪沾满了衣襟，但那些被冻红的手心里，始终紧握着一粒未曾熄灭的火种。' },
+            { count: 20, title: '感知余温', content: '所有的疲惫与落寞，其实都是时光在为你温柔地扎根，正因为见证过冬夜的长，你才比任何人都懂得，每一寸细碎的欢愉都值得被深情收藏。' },
+            { count: 30, title: '唤醒生机', content: '不必急着去奔跑，且听冰层下暗流涌动的声音，那是旧年的遗憾正在消融，它们将化作最甘甜的泉水，滋养你新一岁即将萌发的每一片绿意。' },
+            { count: 40, title: '拥抱晨曦', content: '当第一缕微光吻向你的眼睫，请卸下满身的风霜，试着对远方伸出双手——你会发现，曾经以为难以跨越的山峦，早已在晨曦中化作了起伏温柔的曲线。' },
+            { count: 50, title: '向暖而行', content: '愿你在新的一年里，既有提灯回望的从容，更有向暖而生的笃定；不求轰轰烈烈，只愿你所到之处，万物生光，每一步都踏在花开的节奏上。' }
+        ];
+
+        function playMusic() {
+            if (!hasInteracted) {
+                hasInteracted = true;
+                bgm.play();
+                musicControl.textContent = '⏸️ 暂停音乐';
+                isPlaying = true;
+                document.removeEventListener('click', playMusic);
+                document.removeEventListener('touchstart', playMusic);
+            }
+        }
+
+        document.addEventListener('click', playMusic);
+        document.addEventListener('touchstart', playMusic);
+
+        musicControl.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (isPlaying) {
+                bgm.pause();
+                musicControl.textContent = '🎵 播放音乐';
+                isPlaying = false;
+            } else {
+                bgm.play();
+                musicControl.textContent = '⏸️ 暂停音乐';
+                isPlaying = true;
+            }
+        });
+
+        envelopeWax.addEventListener('click', (e) => {
+            e.stopPropagation();
+            envelope.classList.add('open');
+            setTimeout(() => {
+                letter.classList.add('show');
+            }, 300);
+        });
+
+        closeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            letter.classList.remove('show');
+            letterClosed = true;
+            newYearGreeting.classList.add('show');
+            document.getElementById('backHomeBtn').classList.add('show');
+            setTimeout(() => {
+                envelopeContainer.style.display = 'none';
+                envelope.classList.remove('open');
+                document.body.style.overflow = '';
+            }, 300);
+        });
+
+        function checkClickCount() {
+            if (envelopeShown) {
+                return;
+            }
+            const currentTime = Date.now();
+            if (currentTime - lastClickTime < 600) {
+                return;
+            }
+            lastClickTime = currentTime;
+            clickCount++;
+            clickCounter.textContent = `点击次数: ${clickCount} / ${targetClicks}`;
+
+            for (const msg of messages) {
+                if (clickCount === msg.count && !shownMessages.has(msg.count)) {
+                    shownMessages.add(msg.count);
+                    messageContainer.innerHTML = '';
+                    showMessage(msg);
+                    break;
+                }
+            }
+
+            if (clickCount === 59) {
+                messageContainer.innerHTML = '';
+            }
+
+            if (clickCount >= targetClicks) {
+                envelopeShown = true;
+                envelopeContainer.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function showMessage(msg) {
+            const popup = document.createElement('div');
+            popup.className = 'message-popup';
+            popup.innerHTML = `
+                <h3>${msg.title}</h3>
+                <p>${msg.content}</p>
+            `;
+            messageContainer.appendChild(popup);
+
+            setTimeout(() => {
+                popup.remove();
+            }, 15000);
+        }
+
+        bgm.volume = 0.5;
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const fireworks = [];
+        const particles = [];
+        const colors = [
+            '#ff6b6b', '#feca57', '#48dbfb', '#ff9ff3', '#54a0ff',
+            '#5f27cd', '#00d2d3', '#ff9f43', '#ee5a5a', '#10ac84'
+        ];
+
+        class Firework {
+            constructor(x, y, targetX, targetY) {
+                this.x = x;
+                this.y = y;
+                this.targetX = targetX;
+                this.targetY = targetY;
+                this.speed = 3;
+                this.angle = Math.atan2(targetY - y, targetX - x);
+                this.velocity = {
+                    x: Math.cos(this.angle) * this.speed,
+                    y: Math.sin(this.angle) * this.speed
+                };
+                this.brightness = Math.random() * 50 + 50;
+                this.targetRadius = 1;
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+                this.explosionType = Math.floor(Math.random() * 18);
+            }
+
+            update() {
+                this.x += this.velocity.x;
+                this.y += this.velocity.y;
+
+                const distance = Math.sqrt(
+                    Math.pow(this.targetX - this.x, 2) +
+                    Math.pow(this.targetY - this.y, 2)
+                );
+
+                if (distance < 20) {
+                    this.explode();
+                    return true;
+                }
+
+                return false;
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, 3, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+
+            explode() {
+                switch (this.explosionType) {
+                    case 0:
+                        this.sphereExplosion();
+                        break;
+                    case 1:
+                        this.ringExplosion();
+                        break;
+                    case 2:
+                        this.heartExplosion();
+                        break;
+                    case 3:
+                        this.starExplosion();
+                        break;
+                    case 4:
+                        this.doubleRingExplosion();
+                        break;
+                    case 5:
+                        this.catFaceExplosion();
+                        break;
+                    case 6:
+                        this.dogFaceExplosion();
+                        break;
+                    case 7:
+                        this.rabbitExplosion();
+                        break;
+                    case 8:
+                        this.moonExplosion();
+                        break;
+                    case 9:
+                        this.sunExplosion();
+                        break;
+                    case 10:
+                        this.flowerExplosion();
+                        break;
+                    case 11:
+                        this.butterflyExplosion();
+                        break;
+                    case 12:
+                        this.spiralExplosion();
+                        break;
+                    case 13:
+                        this.crossExplosion();
+                        break;
+                    case 14:
+                        this.snowflakeExplosion();
+                        break;
+                    case 15:
+                        this.pentagramExplosion();
+                        break;
+                    case 16:
+                        this.waveExplosion();
+                        break;
+                    case 17:
+                        this.multiRingExplosion();
+                        break;
+                }
+            }
+
+            sphereExplosion() {
+                const particleCount = 40;
+                for (let i = 0; i < particleCount; i++) {
+                    particles.push(new Particle(this.x, this.y, this.color, 'sphere'));
+                }
+            }
+
+            ringExplosion() {
+                const particleCount = 30;
+                for (let i = 0; i < particleCount; i++) {
+                    const angle = (i / particleCount) * Math.PI * 2;
+                    particles.push(new Particle(this.x, this.y, this.color, 'ring', angle));
+                }
+            }
+
+            heartExplosion() {
+                const particleCount = 50;
+                for (let i = 0; i < particleCount; i++) {
+                    const t = (i / particleCount) * Math.PI * 2;
+                    const x = 16 * Math.pow(Math.sin(t), 3);
+                    const y = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
+                    particles.push(new Particle(this.x, this.y, this.color, 'heart', null, x, y));
+                }
+            }
+
+            starExplosion() {
+                const particleCount = 25;
+                for (let i = 0; i < particleCount; i++) {
+                    const angle = (i / particleCount) * Math.PI * 2;
+                    particles.push(new Particle(this.x, this.y, this.color, 'star', angle));
+                }
+            }
+
+            doubleRingExplosion() {
+                const particleCount = 20;
+                for (let i = 0; i < particleCount; i++) {
+                    const angle = (i / particleCount) * Math.PI * 2;
+                    particles.push(new Particle(this.x, this.y, this.color, 'ring', angle, 5));
+                    particles.push(new Particle(this.x, this.y, this.color, 'ring', angle, 10));
+                }
+            }
+
+            catFaceExplosion() {
+                const particleCount = 100;
+                const catPoints = [
+                    { x: 0, y: -20 },
+                    { x: -15, y: -25 },
+                    { x: 15, y: -25 },
+                    { x: -8, y: -5 },
+                    { x: 8, y: -5 },
+                    { x: 0, y: 5 },
+                    { x: -12, y: 0 },
+                    { x: 12, y: 0 },
+                    { x: -18, y: 2 },
+                    { x: 18, y: 2 },
+                    { x: -5, y: -15 },
+                    { x: 5, y: -15 },
+                    { x: -10, y: 8 },
+                    { x: 10, y: 8 }
+                ];
+
+                for (let i = 0; i < particleCount; i++) {
+                    const point = catPoints[i % catPoints.length];
+                    const offsetX = point.x + (Math.random() - 0.5) * 2;
+                    const offsetY = point.y + (Math.random() - 0.5) * 2;
+                    particles.push(new Particle(this.x, this.y, this.color, 'cat', null, offsetX, offsetY));
+                }
+            }
+
+            dogFaceExplosion() {
+                const particleCount = 125;
+                const dogPoints = [
+                    { x: -12, y: -22 },
+                    { x: 12, y: -22 },
+                    { x: -20, y: -18 },
+                    { x: 20, y: -18 },
+                    { x: -8, y: -5 },
+                    { x: 8, y: -5 },
+                    { x: 0, y: 2 },
+                    { x: -5, y: 8 },
+                    { x: 5, y: 8 },
+                    { x: 0, y: 12 },
+                    { x: -15, y: -12 },
+                    { x: 15, y: -12 },
+                    { x: -8, y: 10 },
+                    { x: 8, y: 10 },
+                    { x: 0, y: -8 },
+                    { x: -3, y: 6 },
+                    { x: 3, y: 6 }
+                ];
+
+                for (let i = 0; i < particleCount; i++) {
+                    const point = dogPoints[i % dogPoints.length];
+                    const offsetX = point.x + (Math.random() - 0.5) * 2;
+                    const offsetY = point.y + (Math.random() - 0.5) * 2;
+                    particles.push(new Particle(this.x, this.y, this.color, 'dog', null, offsetX, offsetY));
+                }
+            }
+
+            rabbitExplosion() {
+                const particleCount = 35;
+                const rabbitPoints = [
+                    { x: -8, y: -25 },
+                    { x: 8, y: -25 },
+                    { x: -12, y: -20 },
+                    { x: 12, y: -20 },
+                    { x: -6, y: -5 },
+                    { x: 6, y: -5 },
+                    { x: 0, y: 0 },
+                    { x: -3, y: 8 },
+                    { x: 3, y: 8 }
+                ];
+
+                for (let i = 0; i < particleCount; i++) {
+                    const point = rabbitPoints[i % rabbitPoints.length];
+                    const offsetX = point.x + (Math.random() - 0.5) * 4;
+                    const offsetY = point.y + (Math.random() - 0.5) * 4;
+                    particles.push(new Particle(this.x, this.y, this.color, 'rabbit', null, offsetX, offsetY));
+                }
+            }
+
+            moonExplosion() {
+                const particleCount = 30;
+                for (let i = 0; i < particleCount; i++) {
+                    const angle = (i / particleCount) * Math.PI * 2;
+                    const r = 18;
+                    particles.push(new Particle(this.x, this.y, this.color, 'moon', angle, r));
+                }
+            }
+
+            sunExplosion() {
+                const particleCount = 35;
+                for (let i = 0; i < particleCount; i++) {
+                    const angle = (i / particleCount) * Math.PI * 2;
+                    const r = 20;
+                    particles.push(new Particle(this.x, this.y, this.color, 'sun', angle, r));
+                }
+            }
+
+            flowerExplosion() {
+                const particleCount = 45;
+                for (let i = 0; i < particleCount; i++) {
+                    const angle = (i / particleCount) * Math.PI * 2;
+                    const r = 14 + Math.random() * 6;
+                    particles.push(new Particle(this.x, this.y, this.color, 'flower', angle, r));
+                }
+            }
+
+            butterflyExplosion() {
+                const particleCount = 40;
+                for (let i = 0; i < particleCount; i++) {
+                    const angle = (i / particleCount) * Math.PI * 2;
+                    const r = 16 + Math.random() * 8;
+                    particles.push(new Particle(this.x, this.y, this.color, 'butterfly', angle, r));
+                }
+            }
+
+            spiralExplosion() {
+                const particleCount = 60;
+                for (let i = 0; i < particleCount; i++) {
+                    const angle = (i / particleCount) * Math.PI * 4;
+                    const radius = (i / particleCount) * 20;
+                    const speed = 5 + (i / particleCount) * 3;
+                    particles.push(new Particle(this.x, this.y, this.color, 'spiral', angle, speed, radius));
+                }
+            }
+
+            crossExplosion() {
+                const particleCount = 40;
+                for (let i = 0; i < particleCount; i++) {
+                    const angle = (i / particleCount) * Math.PI * 2;
+                    const isCross = Math.abs(Math.sin(angle * 2)) > 0.8;
+                    const speed = isCross ? 8 : 3;
+                    particles.push(new Particle(this.x, this.y, this.color, 'cross', angle, speed));
+                }
+            }
+
+            snowflakeExplosion() {
+                const particleCount = 50;
+                for (let i = 0; i < particleCount; i++) {
+                    const angle = (i / particleCount) * Math.PI * 2;
+                    const r = 15 + Math.random() * 5;
+                    particles.push(new Particle(this.x, this.y, this.color, 'snowflake', angle, r));
+                }
+            }
+
+            pentagramExplosion() {
+                const particleCount = 50;
+                for (let i = 0; i < particleCount; i++) {
+                    const angle = (i / particleCount) * Math.PI * 2;
+                    const isPentagram = Math.abs(Math.sin(angle * 5)) > 0.9;
+                    const speed = isPentagram ? 10 : 4;
+                    particles.push(new Particle(this.x, this.y, this.color, 'pentagram', angle, speed));
+                }
+            }
+
+            waveExplosion() {
+                const particleCount = 60;
+                for (let i = 0; i < particleCount; i++) {
+                    const angle = (i / particleCount) * Math.PI * 2;
+                    const wave = Math.sin(angle * 3);
+                    const r = 12 + wave * 8;
+                    particles.push(new Particle(this.x, this.y, this.color, 'wave', angle, r));
+                }
+            }
+
+            multiRingExplosion() {
+                const particleCount = 60;
+                for (let i = 0; i < particleCount; i++) {
+                    const angle = (i / particleCount) * Math.PI * 2;
+                    const ringNum = Math.floor(i / 15);
+                    const r = 8 + ringNum * 6;
+                    particles.push(new Particle(this.x, this.y, this.color, 'ring', angle, r));
+                }
+            }
+        }
+
+        class Particle {
+            constructor(x, y, color, type = 'sphere', angle = null, offsetX = null, offsetY = null) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.type = type;
+                this.alpha = 1;
+                this.friction = 0.96;
+                this.gravity = 0.05;
+                this.decay = Math.random() * 0.015 + 0.01;
+                this.size = 3;
+                this.originalSize = 3;
+                this.rotation = 0;
+                this.rotationSpeed = (Math.random() - 0.5) * 0.1;
+                this.trail = [];
+                this.maxTrailLength = 5;
+                this.twinkle = Math.random() > 0.5;
+                this.twinkleSpeed = Math.random() * 0.1 + 0.05;
+                this.twinklePhase = Math.random() * Math.PI * 2;
+
+                switch (type) {
+                    case 'sphere':
+                        this.velocity = {
+                            x: (Math.random() - 0.5) * 10,
+                            y: (Math.random() - 0.5) * 10
+                        };
+                        break;
+                    case 'ring':
+                        const speed = 6;
+                        this.velocity = {
+                            x: Math.cos(angle) * speed,
+                            y: Math.sin(angle) * speed
+                        };
+                        this.gravity = 0.02;
+                        break;
+                    case 'heart':
+                        const heartSpeed = 4;
+                        this.velocity = {
+                            x: offsetX * heartSpeed / 16,
+                            y: offsetY * heartSpeed / 16
+                        };
+                        this.gravity = 0.03;
+                        break;
+                    case 'star':
+                        const starSpeed = 8;
+                        const starAngle = angle;
+                        const isStarPoint = Math.floor((angle / (Math.PI * 2)) * 5) % 2 === 0;
+                        const speedMultiplier = isStarPoint ? 1.5 : 0.8;
+                        this.velocity = {
+                            x: Math.cos(starAngle) * starSpeed * speedMultiplier,
+                            y: Math.sin(starAngle) * starSpeed * speedMultiplier
+                        };
+                        this.gravity = 0.04;
+                        break;
+                    case 'cat':
+                        const catSpeed = 3;
+                        this.velocity = {
+                            x: offsetX * catSpeed / 20,
+                            y: offsetY * catSpeed / 20
+                        };
+                        this.gravity = 0.025;
+                        break;
+                    case 'dog':
+                        const dogSpeed = 2.5;
+                        this.velocity = {
+                            x: offsetX * dogSpeed / 20,
+                            y: offsetY * dogSpeed / 20
+                        };
+                        this.gravity = 0.03;
+                        break;
+                    case 'rabbit':
+                        const rabbitSpeed = 2.8;
+                        this.velocity = {
+                            x: offsetX * rabbitSpeed / 20,
+                            y: offsetY * rabbitSpeed / 20
+                        };
+                        this.gravity = 0.02;
+                        break;
+                    case 'moon':
+                        const moonSpeed = 3.5;
+                        this.velocity = {
+                            x: Math.cos(angle) * moonSpeed,
+                            y: Math.sin(angle) * moonSpeed
+                        };
+                        this.gravity = 0.015;
+                        break;
+                    case 'sun':
+                        const sunSpeed = 6.5;
+                        this.velocity = {
+                            x: Math.cos(angle) * sunSpeed,
+                            y: Math.sin(angle) * sunSpeed
+                        };
+                        this.gravity = 0.035;
+                        break;
+                    case 'flower':
+                        const flowerSpeed = 4;
+                        this.velocity = {
+                            x: Math.cos(angle) * flowerSpeed,
+                            y: Math.sin(angle) * flowerSpeed
+                        };
+                        this.gravity = 0.025;
+                        break;
+                    case 'butterfly':
+                        const butterflySpeed = 5;
+                        this.velocity = {
+                            x: Math.cos(angle) * butterflySpeed,
+                            y: Math.sin(angle) * butterflySpeed
+                        };
+                        this.gravity = 0.02;
+                        break;
+                    case 'spiral':
+                        const spiralSpeed = offsetX || 6;
+                        this.velocity = {
+                            x: Math.cos(angle) * spiralSpeed,
+                            y: Math.sin(angle) * spiralSpeed
+                        };
+                        this.gravity = 0.03;
+                        break;
+                    case 'cross':
+                        const crossSpeed = offsetX || 7;
+                        this.velocity = {
+                            x: Math.cos(angle) * crossSpeed,
+                            y: Math.sin(angle) * crossSpeed
+                        };
+                        this.gravity = 0.04;
+                        break;
+                    case 'snowflake':
+                        const snowflakeSpeed = offsetX || 4;
+                        this.velocity = {
+                            x: Math.cos(angle) * snowflakeSpeed,
+                            y: Math.sin(angle) * snowflakeSpeed
+                        };
+                        this.gravity = 0.02;
+                        break;
+                    case 'pentagram':
+                        const pentagramSpeed = offsetX || 8;
+                        this.velocity = {
+                            x: Math.cos(angle) * pentagramSpeed,
+                            y: Math.sin(angle) * pentagramSpeed
+                        };
+                        this.gravity = 0.045;
+                        break;
+                    case 'wave':
+                        const waveSpeed = offsetX || 5;
+                        this.velocity = {
+                            x: Math.cos(angle) * waveSpeed,
+                            y: Math.sin(angle) * waveSpeed
+                        };
+                        this.gravity = 0.025;
+                        break;
+                }
+            }
+
+            update() {
+                this.velocity.x *= this.friction;
+                this.velocity.y *= this.friction;
+                this.velocity.y += this.gravity;
+                this.x += this.velocity.x;
+                this.y += this.velocity.y;
+                this.alpha -= this.decay;
+
+                this.rotation += this.rotationSpeed;
+
+                if (this.trail.length >= this.maxTrailLength) {
+                    this.trail.shift();
+                }
+                this.trail.push({ x: this.x, y: this.y, alpha: this.alpha });
+
+                if (this.twinkle) {
+                    this.twinklePhase += this.twinkleSpeed;
+                    this.size = this.originalSize * (0.5 + Math.sin(this.twinklePhase) * 0.5);
+                }
+
+                if (this.alpha < 0.5) {
+                    this.size = this.originalSize * (this.alpha * 2);
+                }
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+
+                if (this.trail.length > 1) {
+                    ctx.beginPath();
+                    ctx.moveTo(this.trail[0].x, this.trail[0].y);
+                    for (let i = 1; i < this.trail.length; i++) {
+                        ctx.lineTo(this.trail[i].x, this.trail[i].y);
+                    }
+                    ctx.strokeStyle = this.color;
+                    ctx.lineWidth = 1;
+                    ctx.globalAlpha = this.alpha * 0.3;
+                    ctx.stroke();
+                    ctx.globalAlpha = this.alpha;
+                }
+
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation);
+
+                if (this.type === 'cat') {
+                    this.drawCat();
+                } else if (this.type === 'dog') {
+                    this.drawDog();
+                } else if (this.type === 'rabbit') {
+                    this.drawRabbit();
+                } else if (this.type === 'moon') {
+                    this.drawMoon();
+                } else if (this.type === 'sun') {
+                    this.drawSun();
+                } else if (this.type === 'flower') {
+                    this.drawFlower();
+                } else if (this.type === 'butterfly') {
+                    this.drawButterfly();
+                } else if (this.type === 'spiral') {
+                    this.drawSpiral();
+                } else if (this.type === 'cross') {
+                    this.drawCross();
+                } else if (this.type === 'snowflake') {
+                    this.drawSnowflake();
+                } else if (this.type === 'pentagram') {
+                    this.drawPentagram();
+                } else if (this.type === 'wave') {
+                    this.drawWave();
+                } else if (this.type === 'ring') {
+                    this.drawMultiRing();
+                } else {
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.size, 0, Math.PI * 2);
+                    ctx.fillStyle = this.color;
+                    ctx.fill();
+                }
+
+                ctx.restore();
+            }
+
+            drawCat() {
+                ctx.beginPath();
+                ctx.arc(0, 0, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.color;
+                ctx.beginPath();
+                ctx.arc(0, 0, this.size * 1.5, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = this.alpha * 0.2;
+                ctx.fill();
+                ctx.globalAlpha = this.alpha;
+                ctx.shadowBlur = 0;
+            }
+
+            drawDog() {
+                ctx.beginPath();
+                ctx.arc(0, 0, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.color;
+                ctx.beginPath();
+                ctx.arc(0, 0, this.size * 1.5, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = this.alpha * 0.2;
+                ctx.fill();
+                ctx.globalAlpha = this.alpha;
+                ctx.shadowBlur = 0;
+            }
+
+            drawRabbit() {
+                ctx.beginPath();
+                ctx.arc(0, 0, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.color;
+                ctx.beginPath();
+                ctx.arc(0, 0, this.size * 1.5, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = this.alpha * 0.2;
+                ctx.fill();
+                ctx.globalAlpha = this.alpha;
+                ctx.shadowBlur = 0;
+            }
+
+            drawMoon() {
+                ctx.beginPath();
+                ctx.arc(0, 0, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.color;
+                ctx.beginPath();
+                ctx.arc(0, 0, this.size * 1.5, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = this.alpha * 0.2;
+                ctx.fill();
+                ctx.globalAlpha = this.alpha;
+                ctx.shadowBlur = 0;
+            }
+
+            drawSun() {
+                ctx.beginPath();
+                ctx.arc(0, 0, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.color;
+                ctx.beginPath();
+                ctx.arc(0, 0, this.size * 1.5, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = this.alpha * 0.2;
+                ctx.fill();
+                ctx.globalAlpha = this.alpha;
+                ctx.shadowBlur = 0;
+            }
+
+            drawFlower() {
+                ctx.beginPath();
+                ctx.arc(0, 0, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.color;
+                ctx.beginPath();
+                ctx.arc(0, 0, this.size * 1.5, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = this.alpha * 0.2;
+                ctx.fill();
+                ctx.globalAlpha = this.alpha;
+                ctx.shadowBlur = 0;
+            }
+
+            drawButterfly() {
+                ctx.beginPath();
+                ctx.arc(0, 0, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.color;
+                ctx.beginPath();
+                ctx.arc(0, 0, this.size * 1.5, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = this.alpha * 0.2;
+                ctx.fill();
+                ctx.globalAlpha = this.alpha;
+                ctx.shadowBlur = 0;
+            }
+
+            drawSpiral() {
+                ctx.beginPath();
+                ctx.arc(0, 0, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = this.color;
+                ctx.beginPath();
+                ctx.arc(0, 0, this.size * 1.8, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = this.alpha * 0.3;
+                ctx.fill();
+                ctx.globalAlpha = this.alpha;
+                ctx.shadowBlur = 0;
+            }
+
+            drawCross() {
+                ctx.beginPath();
+                ctx.arc(0, 0, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = this.color;
+                ctx.beginPath();
+                ctx.arc(0, 0, this.size * 2, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = this.alpha * 0.3;
+                ctx.fill();
+                ctx.globalAlpha = this.alpha;
+                ctx.shadowBlur = 0;
+            }
+
+            drawSnowflake() {
+                ctx.beginPath();
+                ctx.arc(0, 0, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = this.color;
+                ctx.beginPath();
+                ctx.arc(0, 0, this.size * 1.8, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = this.alpha * 0.3;
+                ctx.fill();
+                ctx.globalAlpha = this.alpha;
+                ctx.shadowBlur = 0;
+            }
+
+            drawPentagram() {
+                ctx.beginPath();
+                ctx.arc(0, 0, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = this.color;
+                ctx.beginPath();
+                ctx.arc(0, 0, this.size * 2, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = this.alpha * 0.3;
+                ctx.fill();
+                ctx.globalAlpha = this.alpha;
+                ctx.shadowBlur = 0;
+            }
+
+            drawWave() {
+                ctx.beginPath();
+                ctx.arc(0, 0, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = this.color;
+                ctx.beginPath();
+                ctx.arc(0, 0, this.size * 1.8, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = this.alpha * 0.3;
+                ctx.fill();
+                ctx.globalAlpha = this.alpha;
+                ctx.shadowBlur = 0;
+            }
+
+            drawMultiRing() {
+                ctx.beginPath();
+                ctx.arc(0, 0, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = this.color;
+                ctx.beginPath();
+                ctx.arc(0, 0, this.size * 2, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = this.alpha * 0.3;
+                ctx.fill();
+                ctx.globalAlpha = this.alpha;
+                ctx.shadowBlur = 0;
+            }
+        }
+
+        class Star {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height * 0.5;
+                this.size = Math.random() * 1.2 + 0.3;
+                this.twinkleSpeed = Math.random() * 0.03 + 0.01;
+                this.twinklePhase = Math.random() * Math.PI * 2;
+                this.brightness = Math.random() * 0.3 + 0.2;
+            }
+
+            draw() {
+                this.twinklePhase += this.twinkleSpeed;
+                const alpha = this.brightness * (0.6 + Math.sin(this.twinklePhase) * 0.4);
+
+                ctx.save();
+                ctx.globalAlpha = alpha;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = '#ffffff';
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        class Nebula {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height * 0.6;
+                this.radius = Math.random() * 100 + 50;
+                this.color = `hsla(${Math.random() * 60 + 200}, 70%, 50%, 0.3)`;
+                this.pulseSpeed = Math.random() * 0.01 + 0.005;
+                this.pulsePhase = Math.random() * Math.PI * 2;
+            }
+
+            draw() {
+                this.pulsePhase += this.pulseSpeed;
+                const pulse = 0.8 + Math.sin(this.pulsePhase) * 0.2;
+
+                ctx.save();
+                ctx.globalAlpha = 0.15;
+                const gradient = ctx.createRadialGradient(
+                    this.x, this.y, 0,
+                    this.x, this.y, this.radius * pulse
+                );
+                gradient.addColorStop(0, this.color);
+                gradient.addColorStop(1, 'transparent');
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius * pulse, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        class ShootingStar {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height * 0.3;
+                this.length = Math.random() * 80 + 40;
+                this.speed = Math.random() * 8 + 6;
+                this.angle = Math.PI / 4 + (Math.random() - 0.5) * 0.3;
+                this.opacity = 0;
+                this.fadeIn = true;
+                this.active = false;
+            }
+
+            activate() {
+                this.active = true;
+                this.fadeIn = true;
+            }
+
+            update() {
+                if (!this.active) return;
+
+                this.x += Math.cos(this.angle) * this.speed;
+                this.y += Math.sin(this.angle) * this.speed;
+
+                if (this.fadeIn) {
+                    this.opacity += 0.05;
+                    if (this.opacity >= 1) {
+                        this.opacity = 1;
+                        this.fadeIn = false;
+                    }
+                } else {
+                    this.opacity -= 0.02;
+                }
+
+                if (this.opacity <= 0 || this.x > canvas.width || this.y > canvas.height) {
+                    this.reset();
+                }
+            }
+
+            draw() {
+                if (!this.active) return;
+
+                ctx.save();
+                ctx.globalAlpha = this.opacity;
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2;
+                ctx.lineCap = 'round';
+
+                const gradient = ctx.createLinearGradient(
+                    this.x, this.y,
+                    this.x - Math.cos(this.angle) * this.length,
+                    this.y - Math.sin(this.angle) * this.length
+                );
+                gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+                gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+                ctx.strokeStyle = gradient;
+
+                ctx.beginPath();
+                ctx.moveTo(this.x, this.y);
+                ctx.lineTo(
+                    this.x - Math.cos(this.angle) * this.length,
+                    this.y - Math.sin(this.angle) * this.length
+                );
+                ctx.stroke();
+                ctx.restore();
+            }
+        }
+
+        class Lantern {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = canvas.height + 50;
+                this.topWidth = Math.random() * 15 + 20;
+                this.bottomWidth = this.topWidth * 0.6;
+                this.height = this.topWidth * 1.6;
+                this.speed = Math.random() * 0.15 + 0.1;
+                this.wobble = Math.random() * Math.PI * 2;
+                this.wobbleSpeed = Math.random() * 0.015 + 0.008;
+                this.wobbleAmount = Math.random() * 15 + 10;
+                this.drift = (Math.random() - 0.5) * 0.3;
+                this.driftChange = 0;
+                this.opacity = 0;
+                this.fadeIn = true;
+                this.color = `hsla(${Math.random() * 30 + 10}, 80%, 60%, 0.8)`;
+                this.active = false;
+            }
+
+            activate() {
+                this.active = true;
+                this.fadeIn = true;
+            }
+
+            update() {
+                if (!this.active) return;
+
+                this.y -= this.speed;
+                this.wobble += this.wobbleSpeed;
+
+                this.driftChange += (Math.random() - 0.5) * 0.02;
+                this.driftChange = Math.max(-0.1, Math.min(0.1, this.driftChange));
+                this.drift += this.driftChange;
+                this.drift = Math.max(-0.5, Math.min(0.5, this.drift));
+
+                this.x += Math.sin(this.wobble) * 0.8 + this.drift;
+
+                if (this.fadeIn) {
+                    this.opacity += 0.015;
+                    if (this.opacity >= 1) {
+                        this.opacity = 1;
+                        this.fadeIn = false;
+                    }
+                }
+
+                if (this.y < -100) {
+                    this.reset();
+                }
+            }
+
+            draw() {
+                if (!this.active) return;
+
+                ctx.save();
+                ctx.globalAlpha = this.opacity;
+                ctx.translate(this.x, this.y);
+                ctx.rotate(Math.sin(this.wobble) * 0.1);
+
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.moveTo(-this.topWidth / 2, -this.height / 2);
+                ctx.lineTo(this.topWidth / 2, -this.height / 2);
+                ctx.lineTo(this.bottomWidth / 2, this.height / 2);
+                ctx.lineTo(-this.bottomWidth / 2, this.height / 2);
+                ctx.closePath();
+                ctx.fill();
+
+                ctx.strokeStyle = 'rgba(255, 200, 100, 0.8)';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                ctx.fillStyle = 'rgba(255, 150, 50, 0.6)';
+                ctx.beginPath();
+                ctx.moveTo(-this.topWidth / 2, -this.height / 2);
+                ctx.lineTo(this.topWidth / 2, -this.height / 2);
+                ctx.lineTo(this.bottomWidth / 2, this.height / 2);
+                ctx.lineTo(-this.bottomWidth / 2, this.height / 2);
+                ctx.closePath();
+                ctx.fill();
+
+                ctx.fillStyle = 'rgba(255, 150, 50, 0.4)';
+                ctx.beginPath();
+                ctx.arc(0, 0, this.topWidth / 4, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = this.color;
+                ctx.beginPath();
+                ctx.arc(0, 0, this.topWidth / 3, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255, 200, 100, 0.3)';
+                ctx.fill();
+                ctx.shadowBlur = 0;
+
+                ctx.restore();
+            }
+        }
+
+        const stars = [];
+        const nebulas = [];
+        const shootingStars = [];
+        const lanterns = [];
+
+        function initBackground() {
+            for (let i = 0; i < 50; i++) {
+                stars.push(new Star());
+            }
+            for (let i = 0; i < 8; i++) {
+                nebulas.push(new Nebula());
+            }
+            for (let i = 0; i < 3; i++) {
+                shootingStars.push(new ShootingStar());
+            }
+            for (let i = 0; i < 5; i++) {
+                lanterns.push(new Lantern());
+            }
+        }
+
+        function drawBackground() {
+            for (const star of stars) {
+                star.draw();
+            }
+            for (const nebula of nebulas) {
+                nebula.draw();
+            }
+            for (const shootingStar of shootingStars) {
+                shootingStar.update();
+                shootingStar.draw();
+            }
+            for (const lantern of lanterns) {
+                lantern.update();
+                lantern.draw();
+            }
+        }
+
+        function tryActivateShootingStar() {
+            const inactiveStars = shootingStars.filter(s => !s.active);
+            if (inactiveStars.length > 0 && Math.random() < 0.005) {
+                const star = inactiveStars[Math.floor(Math.random() * inactiveStars.length)];
+                star.activate();
+            }
+        }
+
+        function tryActivateLantern() {
+            const inactiveLanterns = lanterns.filter(l => !l.active);
+            if (inactiveLanterns.length > 0 && Math.random() < 0.003) {
+                const lantern = inactiveLanterns[Math.floor(Math.random() * inactiveLanterns.length)];
+                lantern.activate();
+            }
+        }
+
+        function createFirework() {
+            const startX = Math.random() * canvas.width;
+            const startY = canvas.height;
+            const targetX = Math.random() * canvas.width;
+            const targetY = Math.random() * (canvas.height * 0.6) + 50;
+            fireworks.push(new Firework(startX, startY, targetX, targetY));
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            ctx.fillStyle = 'rgba(10, 10, 26, 0.2)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            drawBackground();
+            tryActivateShootingStar();
+            tryActivateLantern();
+
+            for (let i = fireworks.length - 1; i >= 0; i--) {
+                fireworks[i].draw();
+                if (fireworks[i].update()) {
+                    fireworks.splice(i, 1);
+                }
+            }
+
+            for (let i = particles.length - 1; i >= 0; i--) {
+                particles[i].draw();
+                particles[i].update();
+                if (particles[i].alpha <= 0) {
+                    particles.splice(i, 1);
+                }
+            }
+        }
+
+        let autoFireworkInterval;
+
+        function startAutoFireworks() {
+            autoFireworkInterval = setInterval(() => {
+                if (Math.random() < 0.7) {
+                    createFirework();
+                }
+            }, 800);
+        }
+
+        canvas.addEventListener('click', (e) => {
+            const startX = e.clientX;
+            const startY = canvas.height;
+            fireworks.push(new Firework(startX, startY, e.clientX, e.clientY));
+            checkClickCount();
+
+            if (letterClosed && !isFireworkWaveActive && fireworkWaveCount < 5) {
+                isFireworkWaveActive = true;
+                const fireworkCounts = [5, 10, 15, 20, 25];
+                const currentCount = fireworkCounts[fireworkWaveCount];
+
+                setTimeout(() => {
+                    for (let i = 0; i < currentCount; i++) {
+                        setTimeout(() => {
+                            createFirework();
+                        }, i * 100);
+                    }
+
+                    setTimeout(() => {
+                        fireworkWaveCount++;
+                        isFireworkWaveActive = false;
+                    }, currentCount * 100 + 2000);
+                }, 500);
+            }
+        });
+
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const startX = touch.clientX;
+            const startY = canvas.height;
+            fireworks.push(new Firework(startX, startY, touch.clientX, touch.clientY));
+            checkClickCount();
+
+            if (letterClosed && !isFireworkWaveActive && fireworkWaveCount < 5) {
+                isFireworkWaveActive = true;
+                const fireworkCounts = [5, 10, 15, 20, 25];
+                const currentCount = fireworkCounts[fireworkWaveCount];
+
+                setTimeout(() => {
+                    for (let i = 0; i < currentCount; i++) {
+                        setTimeout(() => {
+                            createFirework();
+                        }, i * 100);
+                    }
+
+                    setTimeout(() => {
+                        fireworkWaveCount++;
+                        isFireworkWaveActive = false;
+                    }, currentCount * 100 + 2000);
+                }, 500);
+            }
+        });
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            stars.length = 0;
+            nebulas.length = 0;
+            initBackground();
+        });
+
+        initBackground();
+        animate();
+        startAutoFireworks();
+    </script>
+</body>
+
+</html>

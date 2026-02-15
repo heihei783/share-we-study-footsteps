@@ -1,0 +1,197 @@
+:root {
+    --glass: rgba(255, 255, 255, 0.2);
+    --border: rgba(255, 255, 255, 0.4);
+    --accent: #ffb7c5;
+    /* 樱花粉 */
+    --text: #4a5568;
+}
+
+body {
+    min-height: 100vh;
+    background: url('https://api.dujin.org/bing/1920.php') no-repeat center center/cover;
+    background-attachment: fixed;
+    font-family: 'PingFang SC', sans-serif;
+    display: flex;
+    justify-content: center;
+    color: var(--text);
+    overflow-x: hidden;
+}
+
+/* 玻璃遮罩背景 */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    z-index: -1;
+}
+
+.container {
+    width: 90%;
+    max-width: 800px;
+    padding: 50px 0;
+    z-index: 1;
+}
+
+.board-header {
+    text-align: center;
+    margin-bottom: 40px;
+    color: #5a67d8;
+}
+
+.board-header h1 {
+    font-size: 2.2rem;
+    margin-bottom: 10px;
+}
+
+/* 通用玻璃卡片 */
+.card {
+    background: var(--glass);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+    padding: 20px;
+    margin-bottom: 25px;
+}
+
+/* 输入框区域 */
+textarea {
+    width: 100%;
+    /* 确保宽度包含内边距，防止撑破框框 */
+    box-sizing: border-box;
+
+    /* 如果还觉得太挤，可以把宽度稍微调小 */
+    /* width: calc(100% - 10px); */
+
+    height: 100px;
+    background: rgba(255, 255, 255, 0.3);
+    border: none;
+    border-radius: 12px;
+    padding: 15px;
+    resize: none;
+    outline: none;
+    font-size: 1rem;
+    color: var(--text);
+}
+
+.input-footer {
+    display: flex;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+#nickname-input {
+    flex: 1;
+    box-sizing: border-box;
+    /* 同样加上这一行 */
+    background: rgba(255, 255, 255, 0.3);
+    border: none;
+    padding: 10px 15px;
+    border-radius: 10px;
+    outline: none;
+}
+
+#submit-btn {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 10px 30px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+#submit-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(255, 183, 197, 0.4);
+}
+
+/* 留言列表项 */
+.message-item {
+    animation: slideUp 0.5s ease-out backwards;
+}
+
+.msg-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 0.85rem;
+    opacity: 0.8;
+}
+
+.msg-author {
+    font-weight: bold;
+    color: #5a67d8;
+}
+
+.msg-content {
+    line-height: 1.6;
+}
+
+.back-home {
+    display: block;
+    text-align: center;
+    margin-top: 30px;
+    text-decoration: none;
+    color: var(--text);
+    font-size: 0.9rem;
+    opacity: 0.6;
+    transition: 0.3s;
+}
+
+.back-home:hover {
+    opacity: 1;
+    color: var(--accent);
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 手机端适配 */
+@media (max-width: 600px) {
+    .input-footer {
+        flex-direction: column;
+    }
+
+    #submit-btn {
+        width: 100%;
+    }
+}
+
+
+/* 管理员删除按钮样式 */
+.del-btn {
+    margin-top: 10px;
+    background: #ff4d4f;
+    color: white;
+    border: none;
+    padding: 5px 12px;
+    border-radius: 5px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.del-btn:hover {
+    background: #ff7875;
+}
+
+.board-header h1 {
+    user-select: none;
+    /* 标准语法 */
+    -webkit-user-select: none;
+    /* Safari 浏览器 */
+    cursor: pointer;
+    /* 让鼠标悬停时显示手型，提示可以点击 */
+}

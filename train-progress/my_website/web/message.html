@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>留言板 - 小混沌</title>
+    <link rel="stylesheet" href="../css_store/message.css">
+</head>
+
+<body>
+    <div class="background-overlay"></div>
+
+    <div class="container">
+        <header class="board-header">
+            <h1>💌 时光留言墙</h1>
+            <p>留下你的足迹，哪怕只是一个表情符号。</p>
+        </header>
+
+        <section class="input-section card">
+            <textarea id="msg-input" placeholder="随便写，后台会保存~(公开的哦，别瞎搞，我可以删的)"></textarea>
+            <div class="input-footer">
+                <input type="text" id="nickname-input" placeholder="你的昵称">
+                <button id="submit-btn">发射！</button>
+            </div>
+        </section>
+
+        <main class="message-list" id="msg-container">
+            <div class="message-item card">
+                <div class="msg-info">
+                    <span class="msg-author">🌸 远方的朋友</span>
+                    <span class="msg-time">2026-01-15</span>
+                </div>
+                <div class="msg-content">测试</div>
+            </div>
+        </main>
+
+        <a href="../index.html" class="back-home">返回主页</a>
+    </div>
+
+    <script src="../java_scr/message.js"></script>
+</body>
+
+</html>
